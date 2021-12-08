@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <stdexcept>
+#include <algorithm>
 
+const char *const IN1_F = "in1.txt";
+const char *const IN2_F = "in2.txt";
+const char *const OUT_F = "rez.txt";
 
 //////////////////////////////////////////////////////////////////////
 
@@ -15,64 +18,84 @@ struct Matrica {
 
     Matrica(size_t eil, size_t stulp) : eil(eil), stulp(stulp), sk(new T[eil*stulp]) {}
 
-    T &operator[](size_t index) const { return this->sk[index]; }
+    Matrica(const Matrica<T>& other) {
+        eil = other.eil;
+        stulp = other.stulp;
+        sk = new T[eil * stulp];
 
-    ~Matrica() { delete[] this->sk; }
+        for (size_t i = 0; i != eil * stulp; ++i) {
+            sk[i] = other[i];
+        }
+    }
 
-    Matrica& operator=(const Matrica& other) {
-        if (&other != this) {
-            delete[] this->sk;
-            this->eil = other.eil;
-            this->stulp = other.stulp;
-            this->sk = new T[this->eil * this->stulp];
+    Matrica& operator=(const Matrica<T>& other) {
+        if(&other != this) {
+            delete[] sk;
+            eil = other.eil;
+            stulp = other.stulp;
+            sk = new T[eil * stulp];
 
-            for (size_t i = 0; i != this->eil * this->stulp; ++i) {
-                this->sk[i] = other[i];
+            for (size_t i = 0; i != eil * stulp; ++i) {
+                sk[i] = other[i];
             }
         }
         return *this;
     }
 
+    T &operator[](size_t index) const { return sk[index]; }
+
+    ~Matrica() { delete[] sk; sk = nullptr; }
+
     Matrica operator+(const Matrica &other) const {
-        if (this->eil != other.eil || this->stulp != other.stulp)
+        if (eil != other.eil || stulp != other.stulp)
             throw std::runtime_error("Negalima sudeti nevienodo dydzio matricu");
 
-        Matrica rez(other.eil, other.stulp);
+        Matrica rez(eil, stulp);
 
-        for (size_t i = 0; i != this->eil * this->stulp; ++i)
-            rez[i] = this->sk[i] + other[i];
+        for (size_t i = 0; i != eil * stulp; ++i)
+            rez[i] = sk[i] + other[i];
 
         return rez;
     }
 
     Matrica operator-(const Matrica &other) const {
-        if (this->eil != other.eil || this->stulp != other.stulp)
+        if (eil != other.eil || stulp != other.stulp)
             throw std::runtime_error("Negalima atimti nevienodo dydzio matricu");
 
-        Matrica rez(other.eil, other.stulp);
+        Matrica rez(eil, stulp);
 
-        for (size_t i = 0; i != this->eil * this->stulp; ++i)
-            rez[i] = this->sk[i] - other[i];
+        for (size_t i = 0; i != eil * stulp; ++i)
+            rez[i] = sk[i] - other[i];
 
         return rez;
     }
 
     Matrica operator*(const Matrica &other) const {
-        if (this->eil != other.stulp || this->stulp != other.eil)
+        if (eil != other.stulp || stulp != other.eil)
             throw std::runtime_error("Pirmos matricos eilutes turi sutikti su antros stulpeliais ir atvirskciai");
 
         Matrica rez(eil, other.stulp);
 
-        for (size_t y = 0; y != this->eil; ++y) {
+        for (size_t y = 0; y != eil; ++y) {
             for (size_t x = 0; x != other.stulp; ++x) {
                 T elem = 0;
-                for (size_t z = 0; z != this->stulp; ++z) {
-                    elem += (this->sk[y * this->stulp + z] * other[z * other.stulp + x]);
+                for (size_t z = 0; z != stulp; ++z) {
+                    elem += (sk[y * stulp + z] * other[z * other.stulp + x]);
                 }
                 rez[y * rez.stulp + x] = elem;
             }
         }
 
+        return rez;
+    }
+
+    Matrica transponuoti() {
+        Matrica rez = *this;
+        for (size_t y = 0; y < eil / 2; ++y) {
+            for (size_t x = 0; x < stulp / 2; ++x) {
+                std::swap(rez[y*stulp+x], rez[(eil-y-1)*stulp+(stulp-x-1)]);
+            }
+        }
         return rez;
     }
 };
@@ -106,9 +129,6 @@ std::ostream &operator<<(std::ostream &os, const Matrica<T> &m) {
 
 //////////////////////////////////////////////////////////////////////
 
-const char *const IN1_F = "in1.txt";
-const char *const IN2_F = "in2.txt";
-const char *const OUT_F = "rez.txt";
 
 int main() {
     std::ifstream in1(IN1_F);
@@ -130,9 +150,17 @@ int main() {
         return 1;
     }
 
-    Matrica<long double> m1, m2, rez;
+    Matrica<long double> m1, m2, trans1, trans2, rez;
     in1 >> m1;
     in2 >> m2;
+
+    trans1 = m1.transponuoti();
+    trans2 = m2.transponuoti();
+
+    std::cout << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
+    out << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
+    std::cout << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
+    out << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
 
     try {
         rez = m1 + m2;
