@@ -98,6 +98,23 @@ struct Matrica {
         }
         return rez;
     }
+
+    size_t max_elem(size_t* arr) {
+       size_t kiek = 0;
+       size_t max = 0;
+
+       for (size_t i = 0; i != stulp*eil; ++i) {
+           if (sk[i] == sk[max]) {
+               arr[(kiek++)] = i;
+           } else if (sk[i] > sk[max]) {
+               kiek = 0;
+               // Nereikia valyti masyvo
+               arr[(kiek++)] = i;
+           }
+       }
+
+       return kiek;
+    }
 };
 
 template <class T>
@@ -123,7 +140,6 @@ std::ostream &operator<<(std::ostream &os, const Matrica<T> &m) {
         }
         os << std::endl;
     }
-
     return os;
 }
 
@@ -156,6 +172,37 @@ int main() {
 
     trans1 = m1.transponuoti();
     trans2 = m2.transponuoti();
+
+    std::cout << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
+    out << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
+    std::cout << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
+    out << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
+
+    auto* idx1 = new size_t[m1.eil*m1.stulp];
+    auto* idx2 = new size_t[m2.eil*m2.stulp];
+    size_t k1, k2;
+
+    k1 = m1.max_elem(idx1);
+    k2 = m2.max_elem(idx2);
+
+    // Netikrina ar tuščia matrica
+    std::cout << "Max pirmos matricos: " << m1[idx1[0]] << ", indeksai: " << std::endl;
+    out << "Max pirmos matricos: " << m1[idx1[0]] << ", indeksai: " << std::endl;
+    for (size_t i = 0; i < k1; ++i) {
+        std::cout << idx1[i] << " ";
+        out << idx1[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+    out << std::endl << std::endl;
+
+    std::cout << "Max antros matricos: " << m2[idx2[0]] << ", indeksai: " << std::endl;
+    out << "Max pirmos matricos: " << m2[idx2[0]] << ", indeksai: " << std::endl;
+    for (size_t i = 0; i < k2; ++i) {
+        std::cout << idx2[i] << " ";
+        out << idx2[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+    out << std::endl << std::endl;
 
     std::cout << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
     out << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
