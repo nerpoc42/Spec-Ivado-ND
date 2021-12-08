@@ -204,11 +204,6 @@ int main() {
     std::cout << std::endl << std::endl;
     out << std::endl << std::endl;
 
-    std::cout << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
-    out << "Pirma transponuota matrica = " << std::endl << trans1 << std::endl;
-    std::cout << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
-    out << "Antra transponuotra matrica = " << std::endl << trans2 << std::endl;
-
     try {
         rez = m1 + m2;
         std::cout << "Sudetis = " << std::endl << rez << std::endl;
